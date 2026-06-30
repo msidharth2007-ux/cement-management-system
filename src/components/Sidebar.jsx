@@ -62,6 +62,8 @@ function Sidebar() {
   const navItems = [
     { label: "Dashboard", path: "/", icon: <MdDashboard /> },
     { label: "Products", path: "/products", icon: <MdInventory /> },
+    { label: "Suppliers", path: "/suppliers", icon: <MdInventory /> },
+    { label: "Purchase Orders", path: "/purchase-orders", icon: <MdReceipt /> },
     { label: "Billing", path: "/billing", icon: <MdReceipt /> },
     { label: "Bill History", path: "/bill-history", icon: <MdHistory /> },
   ];

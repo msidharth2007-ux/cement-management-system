@@ -23,6 +23,8 @@ import Dashboard from "./components/Dashboard";
 import Products from "./components/Products";
 import Billing from "./components/Billing";
 import BillHistory from "./components/BillHistory";
+import Suppliers from "./components/Suppliers";
+import PurchaseOrders from "./components/PurchaseOrders";
 
 /**
  * PageWrapper — wraps each page with fade-in + slide-up animation.
@@ -134,6 +136,26 @@ function App() {
                 element={
                   <PageWrapper>
                     <Products />
+                  </PageWrapper>
+                }
+              />
+
+              {/* Suppliers — manage vendor contacts */}
+              <Route
+                path="/suppliers"
+                element={
+                  <PageWrapper>
+                    <Suppliers />
+                  </PageWrapper>
+                }
+              />
+
+              {/* Purchase Orders — request and receive stock */}
+              <Route
+                path="/purchase-orders"
+                element={
+                  <PageWrapper>
+                    <PurchaseOrders />
                   </PageWrapper>
                 }
               />
