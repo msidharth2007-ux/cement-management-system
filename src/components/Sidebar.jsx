@@ -9,7 +9,7 @@
  *   - Hamburger menu toggle for mobile devices
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase/firebaseConfig";
@@ -26,10 +26,13 @@ import {
   MdClose,
 } from "react-icons/md";
 import { GiConcreteBag } from "react-icons/gi";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase/firebaseConfig";
 
 function Sidebar() {
   // Controls whether sidebar is open on mobile
   const [isOpen, setIsOpen] = useState(false);
+  const [lowStockCount, setLowStockCount] = useState(0);
 
   // useNavigate lets us redirect the user to another page
   const navigate = useNavigate();
@@ -63,6 +66,17 @@ function Sidebar() {
     { label: "Bill History", path: "/bill-history", icon: <MdHistory /> },
   ];
 
+  // Listen for products and compute low-stock count for sidebar badge
+  useEffect(() => {
+    const productsRef = collection(db, "products");
+    const unsubscribe = onSnapshot(productsRef, (snapshot) => {
+      const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const low = data.filter((p) => (p.stock || 0) < 10).length;
+      setLowStockCount(low);
+    });
+    return () => unsubscribe();
+  }, []);
+
   return (
     <>
       {/* Hamburger button — only visible on mobile */}
@@ -94,7 +108,21 @@ function Sidebar() {
               onClick={closeSidebar}
             >
               <span className="nav-icon">{item.icon}</span>
-              <span>{item.label}</span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                {item.label}
+                {item.label === "Products" && lowStockCount > 0 && (
+                  <span style={{
+                    background: "#e02424",
+                    color: "white",
+                    borderRadius: 12,
+                    padding: "2px 8px",
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                  }}>
+                    {lowStockCount}
+                  </span>
+                )}
+              </span>
             </NavLink>
           ))}
         </nav>

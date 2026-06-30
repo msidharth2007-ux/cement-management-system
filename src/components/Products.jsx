@@ -10,7 +10,7 @@
  *   - Real-time data from Firestore (onSnapshot)
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, Timestamp,
 } from "firebase/firestore";
@@ -47,6 +47,35 @@ function Products() {
     });
     return () => unsubscribe();
   }, []);
+
+  // Notify when a product newly falls below low-stock threshold
+  const prevLowRef = useRef(new Set());
+  useEffect(() => {
+    const LOW_THRESHOLD = 10;
+    const currentLow = new Set(products.filter((p) => p.stock < LOW_THRESHOLD).map((p) => p.id));
+
+    // Find newly-low products (in currentLow but not in prevLow)
+    const newlyLow = [];
+    currentLow.forEach((id) => {
+      if (!prevLowRef.current.has(id)) newlyLow.push(id);
+    });
+
+    if (newlyLow.length > 0) {
+      newlyLow.forEach((id) => {
+        const prod = products.find((p) => p.id === id);
+        if (prod) {
+          toast((t) => (
+            <div>
+              <strong>Low stock:</strong> {prod.name} — {prod.stock} bags left
+            </div>
+          ));
+        }
+      });
+    }
+
+    // Update previous low set
+    prevLowRef.current = currentLow;
+  }, [products]);
 
   // Open modal for adding a new product
   const openAddModal = () => {
